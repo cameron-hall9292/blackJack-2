@@ -11,13 +11,18 @@ const cards = new Map();
 
 let cardValue;
 
+
+let keyVals = 1;
+
 for (let i = 0; i < suits.length; i++)
     {
         for (let j = 0; j < names.length; j++)
             {
                 if (names[j] == "J" || names[j] == "Q" || names[j] == "K" || names[j] == "A") cardValue = 10
                 else cardValue = parseInt(names[j]);
-                cards.set(`${names[j]} of ${suits[i]}`, cardValue)
+                //cards.set(`${names[j]} of ${suits[i]}`, cardValue)
+                cards.set(keyVals, { name: `${names[j]} of ${suits[i]}`, value: cardValue, quantity: 1});
+                keyVals++;
             }
     }
     
@@ -26,7 +31,7 @@ for (let i = 0; i < suits.length; i++)
 
 const cardKeys = [...cards.keys()]
 //console.log(cardKeys);
-let drawRandomCard = () => Math.floor(Math.random() * cards.size);
+let drawRandomCard = (mapSize) => Math.round(Math.random() * mapSize);
 
 let playerHand = 
     {
@@ -40,22 +45,22 @@ let playerHand =
 
 const calcValueOfHand = (hand) => 
     {
+        hand.value = 0;
         for (let i = 0; i < hand.cards.length; i++)
             {
-                if (!cards.has(hand.cards[i])) continue;
                
-                hand.value += cards.get(hand.cards[i]);
+                hand.value += hand.cards[i].value;
             }
+
+        return 
     }
 
 const deleteCards = (hand) => 
     {
         let i = 0;
-        calcValueOfHand(hand);
         while (i < hand.cards.length)
             {
                
-                console.log(hand.cards[i])
                 cards.delete(hand.cards[i]);
                 i++;
             }
@@ -72,18 +77,30 @@ const deleteHand = (hand) =>
 
 const draw = (hand,numCards) => 
     {
-        let i = 0; let keys = [...cards.keys()];
+        let i = 0; 
         while (i < numCards)
             {
-                hand.cards.push(keys[i]);
+                let randNum = drawRandomCard(cards.size);
+                if (!cards.has(randNum)) continue;
+                let randCard = cards.get(randNum);
+                hand.cards.push(randCard);
                 hand.count++;
+                hand.value += randCard.value;
+                //delete cards from map
+                cards.delete(randNum);
                 i++;
             }
-        deleteCards(hand);
     }
+    
 
+   //test new map structure
+
+ 
+
+    
     console.log(`map-size: ${cards.size}`);
     draw(playerHand,2);
+    console.log(playerHand);
     console.log(`map-size: ${cards.size}`);
     
     draw(playerHand,3);
@@ -92,5 +109,24 @@ const draw = (hand,numCards) =>
     draw(playerHand,10);
     console.log(`map-size: ${cards.size}`);
     console.log(playerHand);
-    console.log(`hand-value: ${playerHand.value}`);
+    //test random card func
+    const generateRandNums = (testNum) => 
+    {
+    
+    for (let i = 0, j = 0; i < cards.size; i++)
+        {
+            j = drawRandomCard(52);
+            if ( j == testNum) 
+                {
+                    console.log("loop broken")
+                    console.log(`value of j: ${j}`);
+                    break;
+                }
+            
+        console.log(`value of j: ${j}`);
+           
+        }
+    };
+
+    //generateRandNums(0);
 
