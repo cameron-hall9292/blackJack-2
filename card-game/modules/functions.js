@@ -48,6 +48,25 @@ const draw = (hand,numCards,map) =>
     }
 
 
+const createNewHand = (player, label) => 
+    {
+       const handTemplate = 
+        {
+            cards: [],
+            value: 0,
+            count: 0,
+            hasAce: false,
+            pair: false,
+            bust: false,
+        };
+
+        player[label] = handTemplate;
+    }
+
+const split = () => 
+    {
+        //first step will be to create a new hand and move one card from previous hand into it.
+    }
 
     module.exports = 
         {
@@ -55,4 +74,5 @@ const draw = (hand,numCards,map) =>
             deleteHand: deleteHand,
             draw:draw,
             newDeck: newDeck,
+            createNewHand: createNewHand,
         };

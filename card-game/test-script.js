@@ -1,6 +1,7 @@
 
 
-const { newDeck, drawRandomCard, deleteHand, draw } = require("./modules/functions.js")
+const { create } = require("domain");
+const { newDeck, drawRandomCard, deleteHand, draw, createNewHand } = require("./modules/functions.js")
 
 //maps in Javascript!
 //mini project: create a deck of cards and implement them into a map!
@@ -13,35 +14,54 @@ let cardValue;
 let keyVals = 1;
 let numDecks = 1;
 
-// write func to determine how many decks will be combined
-
-let playerHand = 
+const player = 
     {
-        cards: [],
-        value: 0,
-        count: 0
+        1: 
+            {
+                cards: [],
+                value: 0,
+                count: 0,
+                hasAce: false,
+                pair: false,
+                bust: false,
+            },
+        split: false,
+        insurance: false,
+        doubledown: false,
+
     }
 
-let dealerHand = 
+
+const dealer =  
     {
-        cards: [],
-        value: 0,
-        count: 0,
+        1: 
+            {
+                cards: [],
+                value: 0,
+                count: 0,
+                hasAce: false,
+                pair: false,
+                bust: false,
+            },
+        split: false,
+        insurance: false,
+        doubledown: false,
     }
+
+
 
    //test new map structure
 
  
     newDeck(suits,names,cards,cardValue, numDecks, keyVals);
     
-    draw(playerHand, 3, cards);
-    deleteHand(playerHand)
-    draw(playerHand, 3, cards);
+    draw(player[1], 2, cards);
     console.log(`map-size: ${cards.size}`);
-    console.log(playerHand);
-    draw(dealerHand, 4, cards);
-    console.log(dealerHand);
-    console.log(cards.size);
+    createNewHand(player, 2);
+    createNewHand(player, 3);
+
+    console.log(player);
+  
     
  
  
