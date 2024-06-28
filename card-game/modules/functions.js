@@ -1,7 +1,7 @@
 
 let assert = require("assert");
 
-
+const { v4: uuidv4 } = require('uuid');
 
 const newDeck = (suits, names, cards, cardValue, numDecks, keyVals) => 
     {
@@ -27,7 +27,7 @@ const deleteHand = (player, label) =>
        player[label] = null;
        }
 
-const draw = (hand, numCards, map, maxCardNum, numDecks) => 
+const draw = (player, hand, numCards, map, maxCardNum, numDecks) => 
     {
         let i = 0; 
         //log error when number of cards drawn exceeds number of cards in the deck
@@ -36,7 +36,7 @@ const draw = (hand, numCards, map, maxCardNum, numDecks) =>
         try 
 
         {
-
+            let drawArr = [];
           while (i < numCards)
                 {
 
@@ -44,6 +44,7 @@ const draw = (hand, numCards, map, maxCardNum, numDecks) =>
                     if (!map.has(randNum)) continue;
                     let randCard = map.get(randNum);
                     hand.cards.push(randCard);
+                    drawArr.push(randCard);
                     hand.count++;
                     hand.value += randCard.value;
                     randCard.quantity--;
@@ -51,6 +52,9 @@ const draw = (hand, numCards, map, maxCardNum, numDecks) =>
                     if (randCard.quantity == 0) map.delete(randNum);
                     i++;
                 }
+        //add drawn cards to player hand map
+       // player.hand.clear();
+        player.hand.set(uuidv4(), drawArr);
         }catch(error)
         {
             console.error(error);
@@ -77,7 +81,7 @@ const split = () =>
     {
         //first step will be to create a new hand and move one card from previous hand into it.
     }
-
+//console.log(uuidv4())
     module.exports = 
         {
             drawRandomCard: drawRandomCard,

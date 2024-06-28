@@ -1,5 +1,6 @@
 
 
+const { v4: uuidv4 } = require('uuid');
 const { create } = require("domain");
 const { newDeck, drawRandomCard, deleteHand, draw, createNewHand } = require("./modules/functions.js")
 
@@ -15,17 +16,14 @@ let keyVals = 1;
 let numDecks = 1;
 const maxCardNum = 52;
 
+const hand1 = uuidv4();
+const hand2 = uuidv4();
+const hand3 = uuidv4();
+
 const player = 
     {
-        1: 
-            {
-                cards: [],
-                value: 0,
-                count: 0,
-                hasAce: false,
-                pair: false,
-                bust: false,
-            },
+      
+        hand: new Map(),
         split: false,
         insurance: false,
         doubledown: false,
@@ -64,15 +62,17 @@ const dealer =
  
     //let's simulate splitting a hand
 
-
-    draw(player[1], 2, cards, maxCardNum, numDecks);
-    draw(dealer[1], 2, cards, maxCardNum, numDecks);
-    createNewHand(player, 2);
-    createNewHand(player, 3);
-    player[2].cards.push(player[1].cards[0]);
-    player[3].cards.push(player[1].cards[1]);
-    draw(player[2], 1, cards, maxCardNum, numDecks);
-    draw(player[3], 1, cards, maxCardNum, numDecks);
-    player.numHands++;
+    createNewHand(player, hand1);
+    draw(player, player[hand1], 2, cards, maxCardNum, numDecks);
+    draw(player, player[hand1], 1, cards, maxCardNum, numDecks);
+  //  createNewHand(player, hand2);
+    //createNewHand(player, 3);
+    //player[hand2].cards.push(player[1].cards[0]);
+    //player[3].cards.push(player[1].cards[1]);
+    //draw(player, player[2], 1, cards, maxCardNum, numDecks);
+    //draw(player, player[3], 1, cards, maxCardNum, numDecks);
+    //player.numHands++;
     console.log(player);
-    console.log(dealer);
+    //console.log(cards.keys().next().value)
+    //player.hand.set("2222", {test: "some value"})
+   // console.log(player.hand.entries())
