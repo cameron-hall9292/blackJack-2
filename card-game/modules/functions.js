@@ -1,7 +1,12 @@
 
+let assert = require("assert");
+
+
+
 const newDeck = (suits, names, cards, cardValue, numDecks, keyVals) => 
     {
-        
+        cards.clear();
+
         for (let i = 0; i < suits.length; i++)
              {
                     for (let j = 0; j < names.length; j++)
@@ -17,34 +22,39 @@ const newDeck = (suits, names, cards, cardValue, numDecks, keyVals) =>
 
 let drawRandomCard = (mapSize) => Math.round(Math.random() * mapSize);
 
-const deleteHand = (hand) => 
+const deleteHand = (player, label) => 
     {
-        hand.cards.splice(0, hand.cards.length);
-        //reset hand value to 0;
-        hand.value = 0;  
-        hand.count = 0;
-        hand = {};
-    }
+       player[label] = null;
+       }
 
-const draw = (hand,numCards,map) => 
+const draw = (hand, numCards, map, maxCardNum, numDecks) => 
     {
         let i = 0; 
-        while (i < numCards)
-            {
+        //log error when number of cards drawn exceeds number of cards in the deck
+         assert(numCards <= map.size * numDecks, `You requested ${numCards} cards to be drawn and there are only ${map.size * numDecks} cards in the deck.`);
+       
+        try 
 
-                let randNum = drawRandomCard(map.size);
-                if (!map.has(randNum)) continue;
-                let randCard = map.get(randNum);
-                hand.cards.push(randCard);
-                hand.count++;
-                hand.value += randCard.value;
-                randCard.quantity--;
-                //delete cards from map
-                
-                if (randCard.quantity == 0) map.delete(randNum);
-                i++;
-            }
-            
+        {
+
+          while (i < numCards)
+                {
+
+                    let randNum = drawRandomCard(maxCardNum);
+                    if (!map.has(randNum)) continue;
+                    let randCard = map.get(randNum);
+                    hand.cards.push(randCard);
+                    hand.count++;
+                    hand.value += randCard.value;
+                    randCard.quantity--;
+                    //delete cards from map
+                    if (randCard.quantity == 0) map.delete(randNum);
+                    i++;
+                }
+        }catch(error)
+        {
+            console.error(error);
+        }
     }
 
 

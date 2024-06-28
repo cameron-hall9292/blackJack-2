@@ -13,6 +13,7 @@ const cards = new Map();
 let cardValue;
 let keyVals = 1;
 let numDecks = 1;
+const maxCardNum = 52;
 
 const player = 
     {
@@ -28,6 +29,7 @@ const player =
         split: false,
         insurance: false,
         doubledown: false,
+        numHands: 1,
 
     }
 
@@ -46,6 +48,7 @@ const dealer =
         split: false,
         insurance: false,
         doubledown: false,
+        numHands: 1,
     }
 
 
@@ -55,13 +58,21 @@ const dealer =
  
     newDeck(suits,names,cards,cardValue, numDecks, keyVals);
     
-    draw(player[1], 2, cards);
+  
+ 
     console.log(`map-size: ${cards.size}`);
+ 
+    //let's simulate splitting a hand
+
+
+    draw(player[1], 2, cards, maxCardNum, numDecks);
+    draw(dealer[1], 2, cards, maxCardNum, numDecks);
     createNewHand(player, 2);
     createNewHand(player, 3);
-
+    player[2].cards.push(player[1].cards[0]);
+    player[3].cards.push(player[1].cards[1]);
+    draw(player[2], 1, cards, maxCardNum, numDecks);
+    draw(player[3], 1, cards, maxCardNum, numDecks);
+    player.numHands++;
     console.log(player);
-  
-    
- 
- 
+    console.log(dealer);
