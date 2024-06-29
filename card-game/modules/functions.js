@@ -11,7 +11,8 @@ const newDeck = (suits, names, cards, cardValue, numDecks, keyVals) =>
              {
                     for (let j = 0; j < names.length; j++)
                         {
-                            if (names[j] == "J" || names[j] == "Q" || names[j] == "K" || names[j] == "A") cardValue = 10
+                            if (names[j] == "J" || names[j] == "Q" || names[j] == "K") cardValue = 10
+                            else if (names[j] == "A") cardValue = 11
                             else cardValue = parseInt(names[j]);
                             cards.set(keyVals, { name: `${names[j]} of ${suits[i]}`, id: names[j], suit: suits[i], value: cardValue, quantity: numDecks});
                             keyVals++;
@@ -26,8 +27,20 @@ const deleteHand = (player, label) =>
     {
        player[label] = null;
        }
+    
+const calcHandValue = (player, hand, cardMap, handID) => 
+    {
 
-const draw = (player, hand, numCards, map, maxCardNum, numDecks) => 
+        player[cardMap][handID] = 0;
+
+        hand.forEach((card) => 
+        {
+            player[cardMap][handID] += card.value;
+        });
+    
+    }
+
+const draw = (player, hand, numCards, map, maxCardNum, numDecks,cardMap) => 
     {
         let i = 0; 
         //log error when number of cards drawn exceeds number of cards in the deck
@@ -43,7 +56,7 @@ const draw = (player, hand, numCards, map, maxCardNum, numDecks) =>
                     let randNum = drawRandomCard(maxCardNum);
                     if (!map.has(randNum)) continue;
                     let randCard = map.get(randNum);
-                    hand.cards.push(randCard);
+                   // cardMap.cards.push(randCard);
                     drawArr.push(randCard);
                     hand.count++;
                     hand.value += randCard.value;
@@ -53,8 +66,8 @@ const draw = (player, hand, numCards, map, maxCardNum, numDecks) =>
                     i++;
                 }
         //add drawn cards to player hand map
-       // player.hand.clear();
-        player.hand.set(uuidv4(), drawArr);
+        //player.hand.clear();
+        player[cardMap].hand.set(hand, [...player[cardMap].hand.get(hand), ...drawArr]);
         }catch(error)
         {
             console.error(error);
@@ -66,12 +79,9 @@ const createNewHand = (player, label) =>
     {
        const handTemplate = 
         {
-            cards: [],
-            value: 0,
+            hand: new Map(),
             count: 0,
-            hasAce: false,
-            pair: false,
-            bust: false,
+
         };
 
         player[label] = handTemplate;
@@ -89,4 +99,5 @@ const split = () =>
             draw:draw,
             newDeck: newDeck,
             createNewHand: createNewHand,
+            calcHandValue: calcHandValue,
         };
