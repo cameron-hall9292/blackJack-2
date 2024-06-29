@@ -2,7 +2,7 @@
 
 const { v4: uuidv4 } = require('uuid');
 const { create } = require("domain");
-const { newDeck, drawRandomCard, deleteHand, draw, createNewHand, calcHandValue } = require("./modules/functions.js")
+const { newDeck, drawRandomCard, deleteHand, draw, createHandMap, calcHandValue } = require("./modules/functions.js")
 
 //maps in Javascript!
 //mini project: create a deck of cards and implement them into a map!
@@ -33,20 +33,44 @@ console.log(`map-size: ${cards.size}`);
 //let's simulate splitting a hand
 
 
-createNewHand(player, cardMap);
-player[cardMap].hand.set(hand1, []);
-player[cardMap].hand.set(hand2, []);
+createHandMap(player, cardMap);
+
+const playerCardMap = player[cardMap].hand;
+
+playerCardMap.set(hand1, []);
+
 
 
 draw(player, hand1, 2, cards, maxCardNum, numDecks, cardMap);
-draw(player, hand2, 1, cards, maxCardNum, numDecks, cardMap);
-draw(player, hand1, 2, cards, maxCardNum, numDecks, cardMap);
 
 
-calcHandValue(player,player[cardMap].hand.get(hand1), cardMap, hand1);
-calcHandValue(player,player[cardMap].hand.get(hand2), cardMap, hand2);
+
+calcHandValue(player,playerCardMap.get(hand1), cardMap, hand1);
+
+//simulate hand splitting
+
+const splitHand = () => 
+    {
+        //create 2 new hands
+        playerCardMap.set(hand2, []);
+        playerCardMap.set(hand3, []);
+
+        //move each card from first hand into the two newly created hands
+
+        playerCardMap.set(hand2, [playerCardMap.get(hand1)[0]]);
+        playerCardMap.set(hand3, [playerCardMap.get(hand1)[1]]);
+
+
+        //draw 2 cards into the 
+        draw(player, hand2, 1, cards, maxCardNum, numDecks, cardMap);
+        draw(player, hand3, 1, cards, maxCardNum, numDecks, cardMap);
+
+    }
+
+splitHand();
+
+
+
 console.log(player);
-//console.log(player[cardMap].hand.entries())
-//console.log(player[cardMap].hand.get(hand1))
-//console.log(player[cardMap].hand.get(hand2))
 
+console.log(playerCardMap.entries());

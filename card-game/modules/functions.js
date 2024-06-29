@@ -58,7 +58,6 @@ const draw = (player, hand, numCards, map, maxCardNum, numDecks,cardMap) =>
                     let randCard = map.get(randNum);
                    // cardMap.cards.push(randCard);
                     drawArr.push(randCard);
-                    hand.count++;
                     hand.value += randCard.value;
                     randCard.quantity--;
                     //delete cards from map
@@ -68,6 +67,7 @@ const draw = (player, hand, numCards, map, maxCardNum, numDecks,cardMap) =>
         //add drawn cards to player hand map
         //player.hand.clear();
         player[cardMap].hand.set(hand, [...player[cardMap].hand.get(hand), ...drawArr]);
+        player[cardMap].count = player[cardMap].hand.size;
         }catch(error)
         {
             console.error(error);
@@ -75,7 +75,7 @@ const draw = (player, hand, numCards, map, maxCardNum, numDecks,cardMap) =>
     }
 
 
-const createNewHand = (player, label) => 
+const createHandMap = (player, label) => 
     {
        const handTemplate = 
         {
@@ -98,6 +98,6 @@ const split = () =>
             deleteHand: deleteHand,
             draw:draw,
             newDeck: newDeck,
-            createNewHand: createNewHand,
+            createHandMap: createHandMap,
             calcHandValue: calcHandValue,
         };
