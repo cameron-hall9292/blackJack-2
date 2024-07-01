@@ -16,9 +16,8 @@ let keyVals = 1;
 let numDecks = 1;
 const maxCardNum = 52;
 const cardMap = uuidv4();
-const hand1 = uuidv4();
-const hand2 = uuidv4();
-const hand3 = uuidv4();
+
+
 
 const player = {}; 
 const dealer = {};
@@ -35,42 +34,72 @@ console.log(`map-size: ${cards.size}`);
 
 createHandMap(player, cardMap);
 
+//create card map for dealer
+
+createHandMap(dealer, cardMap);
+
 const playerCardMap = player[cardMap].hand;
+const dealerCardMap = dealer[cardMap].hand;
 
-playerCardMap.set(hand1, []);
+playerCardMap.set(uuidv4(), []);
+dealerCardMap.set(uuidv4(), []);
+const firstHand = playerCardMap.keys().next().value;
+
+draw(player, playerCardMap.keys().next().value, 2, cards, maxCardNum, numDecks, cardMap);
+draw(player, playerCardMap.keys().next().value, 2, cards, maxCardNum, numDecks, cardMap);
+draw(dealer, dealerCardMap.keys().next().value, 2, cards, maxCardNum, numDecks, cardMap);
 
 
+calcHandValue(player,playerCardMap.get(playerCardMap.keys().next().value), cardMap, playerCardMap.keys().next().value);
+calcHandValue(dealer,dealerCardMap.get(dealerCardMap.keys().next().value), cardMap, dealerCardMap.keys().next().value);
 
-draw(player, hand1, 2, cards, maxCardNum, numDecks, cardMap);
+
+draw(dealer, dealerCardMap.keys().next().value, 2, cards, maxCardNum, numDecks, cardMap);
+calcHandValue(dealer,dealerCardMap.get(dealerCardMap.keys().next().value), cardMap, dealerCardMap.keys().next().value);
 
 
-
-calcHandValue(player,playerCardMap.get(hand1), cardMap, hand1);
 
 //simulate hand splitting
 
-const splitHand = () => 
+const splitHand = (hand) => 
     {
         //create 2 new hands
-        playerCardMap.set(hand2, []);
-        playerCardMap.set(hand3, []);
+        // playerCardMap.set(uuidv4(), []);
+        // playerCardMap.set(uuidv4(), []);
+
+        const hand2 = uuidv4();
+        const hand3 = uuidv4();
 
         //move each card from first hand into the two newly created hands
 
-        playerCardMap.set(hand2, [playerCardMap.get(hand1)[0]]);
-        playerCardMap.set(hand3, [playerCardMap.get(hand1)[1]]);
+        playerCardMap.set(hand2, [playerCardMap.get(hand)[0]]);
+        playerCardMap.set(hand3, [playerCardMap.get(hand)[1]]);
 
 
-        //draw 2 cards into the 
+        //draw 2 cards into each new hand 
         draw(player, hand2, 1, cards, maxCardNum, numDecks, cardMap);
         draw(player, hand3, 1, cards, maxCardNum, numDecks, cardMap);
 
     }
 
-splitHand();
+splitHand(playerCardMap.keys().next().value);
 
+//playerCardMap.delete(playerCardMap.keys().next().value);
 
+calcHandValue(player,playerCardMap.get(playerCardMap.keys().next().value), cardMap, playerCardMap.keys().next().value);
+
+deleteHand(player, cardMap, playerCardMap.keys().next().value);
+
+calcHandValue(player,playerCardMap.get(playerCardMap.keys().next().value), cardMap, playerCardMap.keys().next().value);
+
+deleteHand(player, cardMap, playerCardMap.keys().next().value);
 
 console.log(player);
+ //console.log(playerCardMap.entries());
 
-console.log(playerCardMap.entries());
+
+ console.log("---------------------dealer logic is below--------------------")
+// console.log(playerCardMap.keys().next().value)
+
+console.log(dealer);
+//console.log(dealerCardMap.entries())

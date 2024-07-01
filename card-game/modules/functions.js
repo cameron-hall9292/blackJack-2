@@ -23,10 +23,17 @@ const newDeck = (suits, names, cards, cardValue, numDecks, keyVals) =>
 
 let drawRandomCard = (mapSize) => Math.round(Math.random() * mapSize);
 
-const deleteHand = (player, label) => 
+const deleteHand = (player, cardMap, handID) => 
     {
-       player[label] = null;
-       }
+       //push value of hand into values array
+
+        
+
+        player[cardMap].valueArray.push(player[cardMap][handID]);
+
+        player[cardMap].hand.delete(handID);
+
+    }
     
 const calcHandValue = (player, hand, cardMap, handID) => 
     {
@@ -37,7 +44,8 @@ const calcHandValue = (player, hand, cardMap, handID) =>
         {
             player[cardMap][handID] += card.value;
         });
-    
+        
+       // player[cardMap].valueArray.push(player[cardMap][handID])
     }
 
 const draw = (player, hand, numCards, map, maxCardNum, numDecks,cardMap) => 
@@ -81,6 +89,7 @@ const createHandMap = (player, label) =>
         {
             hand: new Map(),
             count: 0,
+            valueArray: [],
 
         };
 
