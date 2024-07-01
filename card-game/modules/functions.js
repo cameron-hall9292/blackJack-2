@@ -89,7 +89,27 @@ const createHandMap = (player, label) =>
         {
             hand: new Map(),
             count: 0,
-            valueArray: [],
+            valueArray: ["test"],
+            calcValue: function() 
+                {
+                    
+                    console.log(`label: ${label}`)
+                    this.hand.forEach((key) => 
+                    {
+                        let accumulator = 0;
+
+                        key.forEach((value) => 
+                            {
+                                accumulator += value.value;
+                                console.log(`value: ${value.value}`)
+                                console.log(`accumulator: ${accumulator}`)
+                            })
+                       
+                        //console.log(`valueArray: ${player[label].valueArray}`)
+                    });
+
+                       
+                }
 
         };
 

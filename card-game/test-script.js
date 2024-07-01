@@ -46,16 +46,16 @@ dealerCardMap.set(uuidv4(), []);
 const firstHand = playerCardMap.keys().next().value;
 
 draw(player, playerCardMap.keys().next().value, 2, cards, maxCardNum, numDecks, cardMap);
-draw(player, playerCardMap.keys().next().value, 2, cards, maxCardNum, numDecks, cardMap);
+
+
+
+//calcHandValue(player,playerCardMap.get(playerCardMap.keys().next().value), cardMap, playerCardMap.keys().next().value);
+//calcHandValue(dealer,dealerCardMap.get(dealerCardMap.keys().next().value), cardMap, dealerCardMap.keys().next().value);
+
+
 draw(dealer, dealerCardMap.keys().next().value, 2, cards, maxCardNum, numDecks, cardMap);
-
-
-calcHandValue(player,playerCardMap.get(playerCardMap.keys().next().value), cardMap, playerCardMap.keys().next().value);
 calcHandValue(dealer,dealerCardMap.get(dealerCardMap.keys().next().value), cardMap, dealerCardMap.keys().next().value);
-
-
-draw(dealer, dealerCardMap.keys().next().value, 2, cards, maxCardNum, numDecks, cardMap);
-calcHandValue(dealer,dealerCardMap.get(dealerCardMap.keys().next().value), cardMap, dealerCardMap.keys().next().value);
+deleteHand(dealer, cardMap, dealerCardMap.keys().next().value);
 
 
 
@@ -82,21 +82,22 @@ const splitHand = (hand) =>
 
     }
 
-splitHand(playerCardMap.keys().next().value);
+//splitHand(playerCardMap.keys().next().value);
 
 //playerCardMap.delete(playerCardMap.keys().next().value);
 
-calcHandValue(player,playerCardMap.get(playerCardMap.keys().next().value), cardMap, playerCardMap.keys().next().value);
+//calcHandValue(player,playerCardMap.get(playerCardMap.keys().next().value), cardMap, playerCardMap.keys().next().value);
 
-deleteHand(player, cardMap, playerCardMap.keys().next().value);
+//deleteHand(player, cardMap, playerCardMap.keys().next().value);
 
-calcHandValue(player,playerCardMap.get(playerCardMap.keys().next().value), cardMap, playerCardMap.keys().next().value);
+//calcHandValue(player,playerCardMap.get(playerCardMap.keys().next().value), cardMap, playerCardMap.keys().next().value);
 
-deleteHand(player, cardMap, playerCardMap.keys().next().value);
+//deleteHand(player, cardMap, playerCardMap.keys().next().value);
 
 console.log(player);
  //console.log(playerCardMap.entries());
 
+ console.log(player[cardMap].calcValue(player, cardMap));
 
  console.log("---------------------dealer logic is below--------------------")
 // console.log(playerCardMap.keys().next().value)
