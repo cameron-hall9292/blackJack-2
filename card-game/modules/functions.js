@@ -29,7 +29,7 @@ const deleteHand = (player, cardMap, handID) =>
 
         
 
-        player[cardMap].valueArray.push(player[cardMap][handID]);
+        //player[cardMap].valueArray.push(player[cardMap][handID]);
 
         player[cardMap].hand.delete(handID);
 
@@ -89,26 +89,27 @@ const createHandMap = (player, label) =>
         {
             hand: new Map(),
             count: 0,
-            valueArray: ["test"],
-            calcValue: function() 
+            valueArray: [],
+            deleteHand: function(key)
                 {
+                    this.hand.delete(key);
+                },
+         
+            calcHandValue: function(key)
+                {
+                    let accumulator = 0;
+                    this.hand.get(key).forEach((value) => 
+                        {
+                            accumulator += value.value;
+                        });
                     
-                    console.log(`label: ${label}`)
-                    this.hand.forEach((key) => 
-                    {
-                        let accumulator = 0;
-
-                        key.forEach((value) => 
-                            {
-                                accumulator += value.value;
-                                console.log(`value: ${value.value}`)
-                                console.log(`accumulator: ${accumulator}`)
-                            })
-                       
-                        //console.log(`valueArray: ${player[label].valueArray}`)
-                    });
-
-                       
+                    this.valueArray.push(accumulator);
+                },
+            
+            checkIfSplittable: function(key)
+                {
+                    if (this.hand.get(key)[0].id == this.hand.get(key)[1].id && this.hand.get(key).length == 2) return true
+                    else return false;
                 }
 
         };

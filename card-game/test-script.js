@@ -27,8 +27,6 @@ const dealer = {};
 newDeck(suits,names,cards,cardValue, numDecks, keyVals);
     
  
-console.log(`map-size: ${cards.size}`);
- 
 //let's simulate splitting a hand
 
 
@@ -84,20 +82,16 @@ const splitHand = (hand) =>
 
 //splitHand(playerCardMap.keys().next().value);
 
-//playerCardMap.delete(playerCardMap.keys().next().value);
 
-//calcHandValue(player,playerCardMap.get(playerCardMap.keys().next().value), cardMap, playerCardMap.keys().next().value);
 
-//deleteHand(player, cardMap, playerCardMap.keys().next().value);
 
-//calcHandValue(player,playerCardMap.get(playerCardMap.keys().next().value), cardMap, playerCardMap.keys().next().value);
+ //console.log(player[cardMap].calcHandValue(playerCardMap.keys().next().value))
 
-//deleteHand(player, cardMap, playerCardMap.keys().next().value);
 
-console.log(player);
- //console.log(playerCardMap.entries());
+console.log(player[cardMap].checkIfSplittable(playerCardMap.keys().next().value));
 
- console.log(player[cardMap].calcValue(player, cardMap));
+console.log(player)
+console.log(playerCardMap.entries())
 
  console.log("---------------------dealer logic is below--------------------")
 // console.log(playerCardMap.keys().next().value)
