@@ -24,42 +24,6 @@ const newDeck = (suits, names, cards, cardValue, numDecks, keyVals) =>
 let drawRandomCard = (mapSize) => Math.round(Math.random() * mapSize);
 
 
-
-const draw = (player, hand, numCards, map, maxCardNum, numDecks,cardMap) => 
-    {
-        let i = 0; 
-        //log error when number of cards drawn exceeds number of cards in the deck
-         assert(numCards <= map.size * numDecks, `You requested ${numCards} cards to be drawn and there are only ${map.size * numDecks} cards in the deck.`);
-       
-        try 
-
-        {
-          let drawArr = [];
-          while (i < numCards)
-                {
-
-                    let randNum = drawRandomCard(maxCardNum);
-                    if (!map.has(randNum)) continue;
-                    let randCard = map.get(randNum);
-                   // cardMap.cards.push(randCard);
-                    drawArr.push(randCard);
-                    hand.value += randCard.value;
-                    randCard.quantity--;
-                    //delete cards from map
-                    if (randCard.quantity == 0) map.delete(randNum);
-                    i++;
-                }
-        //add drawn cards to player hand map
-        //player.hand.clear();
-        player[cardMap].hand.set(hand, [...player[cardMap].hand.get(hand), ...drawArr]);
-        player[cardMap].count = player[cardMap].hand.size;
-        }catch(error)
-        {
-            console.error(error);
-        }
-    }
-
-
 const createHandMap = (player, label) => 
     {
        const handTemplate = 
@@ -69,6 +33,8 @@ const createHandMap = (player, label) =>
             valueArray: [],
             deleteHand: function(key)
                 {
+
+                    this.valueArray.push(this.calcHandValue(key));
                     this.hand.delete(key);
                 },
          
@@ -79,8 +45,7 @@ const createHandMap = (player, label) =>
                         {
                             accumulator += value.value;
                         });
-                    
-                    this.valueArray.push(accumulator);
+                    return accumulator;
                 },
             
             checkIfSplittable: function(key)
@@ -117,21 +82,45 @@ const createHandMap = (player, label) =>
                     this.hand.set(hand, [...this.hand.get(hand), ...drawArr]);
                     this.count = this.hand.size;
                 },
+                
+                checkDoubleDown: function (key)
+                    {
+                        const doubleDownVals = [9, 10, 11]
+                        if (doubleDownVals.includes(this.calcHandValue(key)) && this.hand.get(key).length == 2) return true
+                        else return false;
+                    },
+
+                split: function (key, deck, deckSize)
+                    {
+                        if (this.checkIfSplittable(key))
+                            {
+                                const hand1 = uuidv4();
+                                const hand2 = uuidv4();
+
+                                this.hand.set(hand1, [this.hand.get(key)[0]]);
+                                this.hand.set(hand2, [this.hand.get(key)[1]]);
+
+                                this.draw(1, hand1, deck, deckSize);
+                                this.draw(1, hand2, deck, deckSize);
+                            }
+                        else 
+                            {
+                                console.log("cannot split hand");
+                                return;
+                            }
+
+                    }
 
         };
 
         player[label] = handTemplate;
     }
 
-const split = () => 
-    {
-        //first step will be to create a new hand and move one card from previous hand into it.
-    }
-//console.log(uuidv4())
+
+
     module.exports = 
         {
             drawRandomCard: drawRandomCard,
-            draw:draw,
             newDeck: newDeck,
             createHandMap: createHandMap,
            

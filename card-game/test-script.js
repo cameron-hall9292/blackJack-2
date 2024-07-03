@@ -80,13 +80,14 @@ const splitHand = (hand) =>
 
 console.log(playerObj.draw(2, goToFirstHand(playerCardMap), cards, cards.size));
 
-splitHand(playerCardMap.keys().next().value);
+//splitHand(playerCardMap.keys().next().value);
  console.log(playerObj.calcHandValue(goToFirstHand(playerCardMap)))
 
 
-console.log(playerObj.checkIfSplittable(playerCardMap.keys().next().value));
-
-
+console.log(playerObj.checkIfSplittable(goToFirstHand(playerCardMap)));
+console.log(playerObj.checkDoubleDown(goToFirstHand(playerCardMap)));
+//playerObj.deleteHand(goToFirstHand(playerCardMap))
+playerObj.split(goToFirstHand(playerCardMap), cards, cards.size);
 console.log(player)
 console.log(playerCardMap.entries())
 
