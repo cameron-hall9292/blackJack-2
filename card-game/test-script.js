@@ -44,4 +44,6 @@ let dealerHand =
     console.log(cards.size);
     
  
- 
+console.log(playerHand); 
+playerHand.cards2 = ["empty"];
+console.log(playerHand);
