@@ -37,24 +37,19 @@ createHandMap(player, cardMap);
 
 createHandMap(dealer, cardMap);
 
-const playerCardMap = player[cardMap].hand;
-const dealerCardMap = dealer[cardMap].hand;
+const playerObj = player[cardMap];
+const dealerObj = dealer[cardMap];
+
+const playerCardMap = playerObj.hand;
+const dealerCardMap = dealerObj.hand;
 
 playerCardMap.set(uuidv4(), []);
 dealerCardMap.set(uuidv4(), []);
-const firstHand = playerCardMap.keys().next().value;
 
-draw(player, playerCardMap.keys().next().value, 2, cards, maxCardNum, numDecks, cardMap);
-
-
-
-//calcHandValue(player,playerCardMap.get(playerCardMap.keys().next().value), cardMap, playerCardMap.keys().next().value);
-//calcHandValue(dealer,dealerCardMap.get(dealerCardMap.keys().next().value), cardMap, dealerCardMap.keys().next().value);
-
-
-draw(dealer, dealerCardMap.keys().next().value, 2, cards, maxCardNum, numDecks, cardMap);
-calcHandValue(dealer,dealerCardMap.get(dealerCardMap.keys().next().value), cardMap, dealerCardMap.keys().next().value);
-deleteHand(dealer, cardMap, dealerCardMap.keys().next().value);
+const goToFirstHand = (player) => 
+    {
+        return player.keys().next().value;
+    }
 
 
 
@@ -81,15 +76,16 @@ const splitHand = (hand) =>
 
     }
 
-//splitHand(playerCardMap.keys().next().value);
 
 
+console.log(playerObj.draw(2, goToFirstHand(playerCardMap), cards, cards.size));
+
+splitHand(playerCardMap.keys().next().value);
+ console.log(playerObj.calcHandValue(goToFirstHand(playerCardMap)))
 
 
- console.log(player[cardMap].calcHandValue(playerCardMap.keys().next().value))
+console.log(playerObj.checkIfSplittable(playerCardMap.keys().next().value));
 
-
-console.log(player[cardMap].checkIfSplittable(playerCardMap.keys().next().value));
 
 console.log(player)
 console.log(playerCardMap.entries())

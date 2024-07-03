@@ -23,30 +23,7 @@ const newDeck = (suits, names, cards, cardValue, numDecks, keyVals) =>
 
 let drawRandomCard = (mapSize) => Math.round(Math.random() * mapSize);
 
-const deleteHand = (player, cardMap, handID) => 
-    {
-       //push value of hand into values array
 
-        
-
-        //player[cardMap].valueArray.push(player[cardMap][handID]);
-
-        player[cardMap].hand.delete(handID);
-
-    }
-    
-const calcHandValue = (player, hand, cardMap, handID) => 
-    {
-
-        player[cardMap][handID] = 0;
-
-        hand.forEach((card) => 
-        {
-            player[cardMap][handID] += card.value;
-        });
-        
-       // player[cardMap].valueArray.push(player[cardMap][handID])
-    }
 
 const draw = (player, hand, numCards, map, maxCardNum, numDecks,cardMap) => 
     {
@@ -57,7 +34,7 @@ const draw = (player, hand, numCards, map, maxCardNum, numDecks,cardMap) =>
         try 
 
         {
-            let drawArr = [];
+          let drawArr = [];
           while (i < numCards)
                 {
 
@@ -110,7 +87,36 @@ const createHandMap = (player, label) =>
                 {
                     if (this.hand.get(key)[0].id == this.hand.get(key)[1].id && this.hand.get(key).length == 2) return true
                     else return false;
-                }
+                },
+            
+            
+            draw: function(numCards, hand, deck, deckSize)
+                {
+                    if (numCards > deckSize)
+                        {
+                            console.log("not enough cards in the deck");
+                            return;
+                        } 
+                    let drawArr = [];
+                    const numUniqueCards = 52;
+                    let i = 0;
+                    while (i < numCards)
+                        {
+                            
+                            let randNum = Math.round(Math.random() * numUniqueCards);
+                            if (!deck.has(randNum)) continue;
+                            let randCard = deck.get(randNum);
+                            drawArr.push(randCard);
+                            randCard.quantity--;
+                            //delete cards from map
+                            if (randCard.quantity == 0) deck.delete(randNum);
+                            console.log(`deck.size: ${deck.size}`)
+                            i++;
+
+                        }
+                    this.hand.set(hand, [...this.hand.get(hand), ...drawArr]);
+                    this.count = this.hand.size;
+                },
 
         };
 
@@ -125,9 +131,8 @@ const split = () =>
     module.exports = 
         {
             drawRandomCard: drawRandomCard,
-            deleteHand: deleteHand,
             draw:draw,
             newDeck: newDeck,
             createHandMap: createHandMap,
-            calcHandValue: calcHandValue,
+           
         };
