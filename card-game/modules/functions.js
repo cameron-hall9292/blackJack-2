@@ -37,6 +37,18 @@ const createHandMap = (player, label) =>
                     this.valueArray.push(this.calcHandValue(key));
                     this.hand.delete(key);
                 },
+
+            resetHand: function(key, deck, deckSize)
+                {
+                    this.deleteHand(key);
+
+                    if (this.hand.size == 0)
+                        {
+                            let newHand = uuidv4();
+                            this.hand.set(newHand, []);
+                            this.draw(2, newHand, deck, deckSize);
+                        }
+                },
          
             calcHandValue: function(key)
                 {
@@ -55,7 +67,7 @@ const createHandMap = (player, label) =>
                 },
             
             
-            draw: function(numCards, hand, deck, deckSize)
+            draw: function(numCards, key, deck, deckSize)
                 {
                     if (numCards > deckSize)
                         {
@@ -79,7 +91,7 @@ const createHandMap = (player, label) =>
                             i++;
 
                         }
-                    this.hand.set(hand, [...this.hand.get(hand), ...drawArr]);
+                    this.hand.set(key, [...this.hand.get(key), ...drawArr]);
                     this.count = this.hand.size;
                 },
                 
@@ -109,6 +121,32 @@ const createHandMap = (player, label) =>
                                 return;
                             }
 
+                    },
+                
+                checkForAces: function(key)
+                    {
+                        return this.hand.get(key).some((card) => card.id == "A" && card.value == 11);
+                    },
+               changeAceValue: function(key)
+                    {
+                        return this.hand.get(key).find((card) => card.id == "A" && card.value == 11);
+                    },
+                hit: function (key, deck, deckSize) 
+                    {
+                        if (this.calcHandValue(key) < 21) 
+                            {
+                                this.draw(1, key, deck, deckSize)
+
+                                if (this.checkForAces(key) && this.calcHandValue(key) > 21)
+                                    {
+                                        this.changeAceValue(key).value = 1;
+                                    }
+                            }
+                        else 
+                            {
+                                console.log("cannot hit when at or below 21")
+                                return
+                            }
                     }
 
         };

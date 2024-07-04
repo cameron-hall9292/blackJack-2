@@ -3,6 +3,7 @@
 const { v4: uuidv4 } = require('uuid');
 const { create } = require("domain");
 const { newDeck, drawRandomCard, deleteHand, draw, createHandMap, calcHandValue } = require("./modules/functions.js")
+const prompt = require('prompt-sync')({sigint: true});
 
 //maps in Javascript!
 //mini project: create a deck of cards and implement them into a map!
@@ -78,18 +79,59 @@ const splitHand = (hand) =>
 
 
 
-console.log(playerObj.draw(2, goToFirstHand(playerCardMap), cards, cards.size));
+//playerObj.draw(2, goToFirstHand(playerCardMap), cards, cards.size);
 
 //splitHand(playerCardMap.keys().next().value);
- console.log(playerObj.calcHandValue(goToFirstHand(playerCardMap)))
+// console.log(playerObj.calcHandValue(goToFirstHand(playerCardMap)))
 
 
-console.log(playerObj.checkIfSplittable(goToFirstHand(playerCardMap)));
-console.log(playerObj.checkDoubleDown(goToFirstHand(playerCardMap)));
+//console.log(playerObj.checkIfSplittable(goToFirstHand(playerCardMap)));
+//console.log(playerObj.checkDoubleDown(goToFirstHand(playerCardMap)));
 //playerObj.deleteHand(goToFirstHand(playerCardMap))
-playerObj.split(goToFirstHand(playerCardMap), cards, cards.size);
-console.log(player)
-console.log(playerCardMap.entries())
+//playerObj.split(goToFirstHand(playerCardMap), cards, cards.size);
+//playerObj.hit(goToFirstHand(playerCardMap), cards, cards.size);
+//playerObj.hit(goToFirstHand(playerCardMap), cards, cards.size);
+//console.log(playerObj.checkForAces(goToFirstHand(playerCardMap)));
+//console.log(playerObj.changeAceValue(goToFirstHand(playerCardMap)))
+//console.log(player)
+//console.log(playerCardMap.entries())
+
+//add keyboard events to test game logic
+
+
+
+let gamePrompt = null;
+
+
+playerObj.draw(2, goToFirstHand(playerCardMap), cards, cards.size);
+
+console.log(playerCardMap.values());
+
+while (gamePrompt != "quit")
+    {
+        gamePrompt = prompt("press h to hit: ");
+       
+        if (gamePrompt == "h") 
+            {
+
+                playerObj.hit(goToFirstHand(playerCardMap), cards, cards.size);
+                console.log(playerCardMap.values());
+                console.log(playerObj.calcHandValue(goToFirstHand(playerCardMap)))
+                
+                if (playerObj.calcHandValue(goToFirstHand(playerCardMap)) > 21)
+                    {
+                        playerObj.resetHand(goToFirstHand(playerCardMap), cards, cards.size);
+                        console.log(playerCardMap.values());
+                    }
+            };
+    }
+
+//window.addEventListener("keyup", (event) => 
+//{
+    //if (event.key === "h" || event.key === "H")
+        //playerObj.hit(goToFirstHand(playerCardMap), cards, cards.size);
+        //console.log(playerCardMap.entries());
+//})
 
  console.log("---------------------dealer logic is below--------------------")
 // console.log(playerCardMap.keys().next().value)
