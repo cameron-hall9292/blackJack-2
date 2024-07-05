@@ -37,17 +37,25 @@ const createHandMap = (player, label) =>
                     this.valueArray.push(this.calcHandValue(key));
                     this.hand.delete(key);
                 },
+            
+            clearValueArr: function()
+                {
+                    this.valueArray.splice(0, this.valueArray.length);
+                },
 
             resetHand: function(key, deck, deckSize)
                 {
-                    this.deleteHand(key);
+                    //this.deleteHand(key);
 
                     if (this.hand.size == 0)
                         {
                             let newHand = uuidv4();
+                            key = newHand;
                             this.hand.set(newHand, []);
                             this.draw(2, newHand, deck, deckSize);
-                        }
+                        };
+                    //console.log("You: ")
+                    //this.printHand(key);
                 },
          
             calcHandValue: function(key)
@@ -59,6 +67,29 @@ const createHandMap = (player, label) =>
                         });
                     return accumulator;
                 },
+            
+            printHand: function(key, hide)
+                {
+                    let printArr = [];
+
+                    this.hand.get(key).forEach((card) => 
+                    {
+                        printArr.push(card.name);
+                    });
+                    if (hide)
+                    {
+                        printArr.pop();
+                        printArr.push("facedown card")
+                        console.log(printArr);
+                    }
+                    else
+                    {
+                        printArr.push({value: this.calcHandValue(key)});
+                        console.log(printArr);
+                        return;
+
+                    }
+                                   },
             
             checkIfSplittable: function(key)
                 {
@@ -87,7 +118,7 @@ const createHandMap = (player, label) =>
                             randCard.quantity--;
                             //delete cards from map
                             if (randCard.quantity == 0) deck.delete(randNum);
-                            console.log(`deck.size: ${deck.size}`)
+                            //console.log(`deck.size: ${deck.size}`)
                             i++;
 
                         }
@@ -114,6 +145,8 @@ const createHandMap = (player, label) =>
 
                                 this.draw(1, hand1, deck, deckSize);
                                 this.draw(1, hand2, deck, deckSize);
+                                //delete initial hand
+                                this.hand.delete(key);
                             }
                         else 
                             {
@@ -131,23 +164,73 @@ const createHandMap = (player, label) =>
                     {
                         return this.hand.get(key).find((card) => card.id == "A" && card.value == 11);
                     },
+                
+                checkBust: function(key)
+                    {
+                        if (this.calcHandValue(key) > 21)
+                        {
+                            return true;
+                        }
+                    },
+                
+                checkBlackJack: function(key)
+                    {
+                        if (this.calcHandValue(key) === 21)
+                        {
+                            return true;
+                        }
+                    },
+                
                 hit: function (key, deck, deckSize) 
                     {
                         if (this.calcHandValue(key) < 21) 
                             {
-                                this.draw(1, key, deck, deckSize)
+                                this.draw(1, key, deck, deckSize);
+
+                                //check for aces and modify their values if hand value exceeds 21
 
                                 if (this.checkForAces(key) && this.calcHandValue(key) > 21)
                                     {
                                         this.changeAceValue(key).value = 1;
-                                    }
+                                    };
+
+                                //this.printHand(key);
+
+                                //check if player has busted and print it out if they have
+                                
+                                if (this.checkBust(key)) 
+                                {
+                                   // console.log("BUST!!!");
+                                   // this.resetHand(key, deck, deckSize); 
+                                }
+                                else if (this.checkBlackJack(key))
+                                {
+                                    //console.log("BLACKJACK!!!")
+                                    //this.resetHand(key, deck, deckSize);
+                                }
                             }
                         else 
                             {
-                                console.log("cannot hit when at or below 21")
+                                console.log("------cannot hit when at or above 21------")
                                 return
                             }
-                    }
+                    },
+                dealerPlays: function (key, deck, deckSize)
+                {
+
+                    while (this.calcHandValue(key) < 17)
+                    {
+                        this.hit(key, deck, deckSize);
+                    };
+
+                    return;
+                
+                },
+
+                stand: function(key, deck, deckSize) 
+                {
+                    
+                },
 
         };
 

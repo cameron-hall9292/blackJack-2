@@ -14,7 +14,7 @@ const cards = new Map();
 
 let cardValue;
 let keyVals = 1;
-let numDecks = 1;
+let numDecks = 2000;
 const maxCardNum = 52;
 const cardMap = uuidv4();
 
@@ -54,87 +54,91 @@ const goToFirstHand = (player) =>
 
 
 
-//simulate hand splitting
-
-const splitHand = (hand) => 
-    {
-        //create 2 new hands
-        // playerCardMap.set(uuidv4(), []);
-        // playerCardMap.set(uuidv4(), []);
-
-        const hand2 = uuidv4();
-        const hand3 = uuidv4();
-
-        //move each card from first hand into the two newly created hands
-
-        playerCardMap.set(hand2, [playerCardMap.get(hand)[0]]);
-        playerCardMap.set(hand3, [playerCardMap.get(hand)[1]]);
-
-
-        //draw 2 cards into each new hand 
-        draw(player, hand2, 1, cards, maxCardNum, numDecks, cardMap);
-        draw(player, hand3, 1, cards, maxCardNum, numDecks, cardMap);
-
-    }
-
-
-
-//playerObj.draw(2, goToFirstHand(playerCardMap), cards, cards.size);
-
-//splitHand(playerCardMap.keys().next().value);
-// console.log(playerObj.calcHandValue(goToFirstHand(playerCardMap)))
-
-
-//console.log(playerObj.checkIfSplittable(goToFirstHand(playerCardMap)));
-//console.log(playerObj.checkDoubleDown(goToFirstHand(playerCardMap)));
-//playerObj.deleteHand(goToFirstHand(playerCardMap))
-//playerObj.split(goToFirstHand(playerCardMap), cards, cards.size);
-//playerObj.hit(goToFirstHand(playerCardMap), cards, cards.size);
-//playerObj.hit(goToFirstHand(playerCardMap), cards, cards.size);
-//console.log(playerObj.checkForAces(goToFirstHand(playerCardMap)));
-//console.log(playerObj.changeAceValue(goToFirstHand(playerCardMap)))
-//console.log(player)
-//console.log(playerCardMap.entries())
-
-//add keyboard events to test game logic
-
-
 
 let gamePrompt = null;
 
 
 playerObj.draw(2, goToFirstHand(playerCardMap), cards, cards.size);
+dealerObj.draw(2, goToFirstHand(dealerCardMap), cards, cards.size);
 
-console.log(playerCardMap.values());
+const reset = () => 
+{
+        dealerObj.deleteHand(goToFirstHand(dealerCardMap), cards, cards.size);
+        dealerObj.resetHand(goToFirstHand(dealerCardMap), cards, cards.size);
+        dealerObj.clearValueArr();
+        playerObj.resetHand(goToFirstHand(playerCardMap), cards, cards.size);
+        playerObj.clearValueArr();
+        
+};
 
+const compareHands = (player, dealer) => 
+{
+    if (player == dealer)
+    {
+        console.log("tie");
+    }
+    else if (player > 21)
+    {
+        console.log("dealer wins");
+    }
+    else if (dealer > 21)
+    {
+        console.log("you wins");
+    }
+    else if (player > dealer)
+    {
+        console.log("you win");
+    }
+    else if (player < dealer)
+    {
+        console.log("dealer wins");
+    }
+}
 while (gamePrompt != "quit")
     {
-        gamePrompt = prompt("press h to hit: ");
+        console.log("Dealer: ");
+        dealerObj.printHand(goToFirstHand(dealerCardMap), false)
+        console.log("You: ")
+        playerObj.printHand(goToFirstHand(playerCardMap))
+
+        gamePrompt = prompt("press h to hit, s to stand, sp to split: ");
        
         if (gamePrompt == "h") 
             {
-
                 playerObj.hit(goToFirstHand(playerCardMap), cards, cards.size);
-                console.log(playerCardMap.values());
-                console.log(playerObj.calcHandValue(goToFirstHand(playerCardMap)))
-                
-                if (playerObj.calcHandValue(goToFirstHand(playerCardMap)) > 21)
-                    {
-                        playerObj.resetHand(goToFirstHand(playerCardMap), cards, cards.size);
-                        console.log(playerCardMap.values());
-                    }
+            
             };
-    }
+        if (gamePrompt == "sp")
+        {
+            playerObj.split(goToFirstHand(playerCardMap), cards, cards.size);
+        };
+        
+        if (gamePrompt == "s")
+        {
+            if (playerCardMap.size > 0)
+            {
+                playerObj.deleteHand(goToFirstHand(playerCardMap));
+            }
+            if (playerCardMap.size === 0)
+            {
+            
+            dealerObj.dealerPlays(goToFirstHand(dealerCardMap), cards, cards.size);
 
-//window.addEventListener("keyup", (event) => 
-//{
-    //if (event.key === "h" || event.key === "H")
-        //playerObj.hit(goToFirstHand(playerCardMap), cards, cards.size);
-        //console.log(playerCardMap.entries());
-//})
+            dealerObj.printHand(goToFirstHand(dealerCardMap));
+
+            playerObj.valueArray.forEach((value) => {
+                compareHands(value, dealerObj.calcHandValue(goToFirstHand(dealerCardMap)));
+            });
+
+           
+
+            reset();
+            }
+        }
+    }
 
  console.log("---------------------dealer logic is below--------------------")
 // console.log(playerCardMap.keys().next().value)
 
-console.log(dealer);
+//console.log(dealer);
 //console.log(dealerCardMap.entries())
