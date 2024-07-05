@@ -135,7 +135,7 @@ const createHandMap = (player, label) =>
 
                 split: function (key, deck, deckSize)
                     {
-                        if (this.checkIfSplittable(key))
+                        if (!this.checkIfSplittable(key))
                             {
                                 const hand1 = uuidv4();
                                 const hand2 = uuidv4();

@@ -71,7 +71,7 @@ const reset = () =>
         
 };
 
-const compareHands = (player, dealer) => 
+const compareHands = (player, dealer, money, bet) => 
 {
     if (player == dealer)
     {
@@ -80,28 +80,80 @@ const compareHands = (player, dealer) =>
     else if (player > 21)
     {
         console.log("dealer wins");
+        money -= bet;
     }
     else if (dealer > 21)
     {
         console.log("you wins");
+        money += bet;
     }
     else if (player > dealer)
     {
         console.log("you win");
+        money += bet;
     }
     else if (player < dealer)
     {
         console.log("dealer wins");
+        money -= bet;
     }
+    //console.log(`money: ${money}`);
+    return money;
 }
+let min = 10;
+let max = 5000;
+let buyIn = null;
+let money = null;
+while(buyIn == null)
+{
+        buyIn = prompt(`Enter a number between ${min} and ${max}: `);
+        money = Number(buyIn);
+        if (!money)
+        {
+            console.log("not a valid buyin amount. try again. ");
+            buyIn = null;
+        }
+        else if (money < min || money > max)
+        {
+            console.log("buyin is outside of range. try again. ")
+            buyIn = null;
+        }
+        
+};
+
+let bet = null;
+
 while (gamePrompt != "quit")
     {
+        if (money === 0)
+        {
+            console.log("you are out of cash. gameover ");
+            gamePrompt = "quit";
+            continue;
+        }
+        console.log(`Your cash: ${money}`);
         console.log("Dealer: ");
         dealerObj.printHand(goToFirstHand(dealerCardMap), false)
         console.log("You: ")
         playerObj.printHand(goToFirstHand(playerCardMap))
+        while (bet == null)
+        {
+            bet = prompt("place a bet: ")
+            bet = Number(bet);
+            if (!bet)
+            {
+                console.log("Not a valid bet. Try again.")
+                bet = null;
+            }
+           else if (bet > money) 
+            {
+                console.log("Not enough cash. Place a smaller bet");
+                bet = null;
+            }
+          
+        }
 
-        gamePrompt = prompt("press h to hit, s to stand, sp to split: ");
+        gamePrompt = prompt("type h to hit, s to stand, sp to split, or quit to quit the game: ");
        
         if (gamePrompt == "h") 
             {
@@ -127,12 +179,13 @@ while (gamePrompt != "quit")
             dealerObj.printHand(goToFirstHand(dealerCardMap));
 
             playerObj.valueArray.forEach((value) => {
-                compareHands(value, dealerObj.calcHandValue(goToFirstHand(dealerCardMap)));
+                money = compareHands(value, dealerObj.calcHandValue(goToFirstHand(dealerCardMap)), money, bet);
             });
 
            
 
             reset();
+            bet = null;
             }
         }
     }
