@@ -20,6 +20,17 @@ const newDeck = (suits, names, cards, cardValue, numDecks, keyVals) =>
                 }
      }
 
+const deckLength = (deck) => 
+{
+    let accumulator = 0;
+
+    deck.forEach((card) => 
+    {
+        accumulator += card.quantity;
+    });
+
+    return accumulator;
+}
 
 let drawRandomCard = (mapSize) => Math.round(Math.random() * mapSize);
 
@@ -35,7 +46,7 @@ const createHandMap = (player, label) =>
             deleteHand: function(key, bet)
                 {
                     this.betArray.push(bet);
-                    console.log(`bet array: ${this.betArray}`)
+                    //console.log(`bet array: ${this.betArray}`)
                     this.valueArray.push(this.calcHandValue(key));
                     this.hand.delete(key);
                 },
@@ -46,14 +57,13 @@ const createHandMap = (player, label) =>
                     this.betArray.splice(0, this.betArray.length);
                 },
 
-            resetHand: function(key, deck, deckSize)
+            resetHand: function(deck, deckSize)
                 {
                     //this.deleteHand(key);
 
                     if (this.hand.size == 0)
                         {
                             let newHand = uuidv4();
-                            key = newHand;
                             this.hand.set(newHand, []);
                             this.draw(2, newHand, deck, deckSize);
                         };
@@ -103,11 +113,7 @@ const createHandMap = (player, label) =>
             
             draw: function(numCards, key, deck, deckSize)
                 {
-                    if (numCards > deckSize)
-                        {
-                            console.log("not enough cards in the deck");
-                            return;
-                        } 
+                    assert(numCards < deckSize, "error: number of cards requested for draw < number of cards in deck") 
                     let drawArr = [];
                     const numUniqueCards = 52;
                     let i = 0;
@@ -117,10 +123,11 @@ const createHandMap = (player, label) =>
                             let randNum = Math.round(Math.random() * numUniqueCards);
                             if (!deck.has(randNum)) continue;
                             let randCard = Object.assign({}, deck.get(randNum));
+                            let deckCard = deck.get(randNum);
                             drawArr.push(randCard);
-                            randCard.quantity--;
+                            deckCard.quantity--;
                             //delete cards from map
-                            if (randCard.quantity == 0) deck.delete(randNum);
+                            if (deckCard.quantity == 0) deck.delete(randNum);
                             //console.log(`deck.size: ${deck.size}`)
                             i++;
 
@@ -138,6 +145,34 @@ const createHandMap = (player, label) =>
 
                 },
 
+                testDraw: function(numCards, key, deck, deckSize, card1, card2)
+                {
+
+                    
+                    assert(numCards < deckSize, "error: number of cards requested for draw < number of cards in deck") 
+                    let drawArr = [];
+                    let requestedCards = [card1, card2];
+                    const numUniqueCards = 52;
+                    let i = 0;
+                    while (i < numCards)
+                        {
+                            
+                            let randCard = Object.assign({}, deck.get(requestedCards[i]));
+                            drawArr.push(randCard);
+                            i++;
+
+                        }
+                    this.hand.set(key, [...this.hand.get(key), ...drawArr]);
+                    this.count = this.hand.size;
+
+                     //check for aces and modify their values if hand value exceeds 21
+
+                    if (this.checkForAces(key) && this.calcHandValue(key) > 21)
+                        {
+                            this.changeAceValue(key).value = 1;
+                        };
+                },
+
                 hasInsuranceBet: false,
 
                 checkInsurance: function(key)
@@ -153,12 +188,12 @@ const createHandMap = (player, label) =>
 
                 insuranceBet: function(key, money, sideBet)
                 {
-                    if (!this.checkInsurance(key))
+                    if (this.checkInsurance(key))
                     {
                         if (this.hand.get(key)[1].value === 10) 
                             {
                                 money += sideBet * 2;
-                                this.printHand(key, false);
+                                //this.printHand(key, false);
                             }
                         else money -= sideBet;
                         
@@ -183,14 +218,15 @@ const createHandMap = (player, label) =>
                 
                 doubleDown: function (key, bet, deck, deckSize)
                     {
-                        if (!this.checkDoubleDown(key))
+                        if (this.checkDoubleDown(key))
                         {
+                            this.hasDoubledDown = true;
                             this.hit(key, deck, deckSize);
                             this.printHand(key, false);
                             bet *= 2;
-                            this.hasDoubledDown = true;
+                            return bet;
                         }
-                        return bet;
+                        else return false;
                     },
                 
                 playerReset: function()
@@ -201,7 +237,7 @@ const createHandMap = (player, label) =>
 
                 split: function (key, deck, deckSize)
                     {
-                        if (!this.checkIfSplittable(key))
+                        if (this.checkIfSplittable(key))
                             {
                                 const hand1 = uuidv4();
                                 const hand2 = uuidv4();
@@ -249,7 +285,7 @@ const createHandMap = (player, label) =>
                 
                 hit: function (key, deck, deckSize) 
                     {
-                        if (this.calcHandValue(key) < 21 && !this.hasDoubledDown) 
+                        if (this.calcHandValue(key) < 21) 
                             {
                                 this.draw(1, key, deck, deckSize);
 
@@ -310,5 +346,6 @@ const createHandMap = (player, label) =>
             drawRandomCard: drawRandomCard,
             newDeck: newDeck,
             createHandMap: createHandMap,
+            deckLength: deckLength,
            
         };

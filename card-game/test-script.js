@@ -2,7 +2,7 @@
 
 const { v4: uuidv4 } = require('uuid');
 const { create } = require("domain");
-const { newDeck, drawRandomCard, deleteHand, draw, createHandMap, calcHandValue } = require("./modules/functions.js")
+const { newDeck, drawRandomCard, deleteHand, draw, createHandMap, calcHandValue, deckLength } = require("./modules/functions.js")
 const prompt = require('prompt-sync')({sigint: true});
 
 //maps in Javascript!
@@ -14,7 +14,7 @@ const cards = new Map();
 
 let cardValue;
 let keyVals = 1;
-let numDecks = 2000;
+let numDecks = 2;
 const maxCardNum = 52;
 const cardMap = uuidv4();
 
@@ -27,7 +27,7 @@ const dealer = {};
 
 newDeck(suits,names,cards,cardValue, numDecks, keyVals);
     
- 
+const shuffleSize = cards.size * numDecks * 0.5;
 
 //let's simulate splitting a hand
 
@@ -58,15 +58,18 @@ const goToFirstHand = (player) =>
 let gamePrompt = null;
 
 
-playerObj.draw(2, goToFirstHand(playerCardMap), cards, cards.size);
-dealerObj.draw(2, goToFirstHand(dealerCardMap), cards, cards.size);
+//playerObj.draw(2, goToFirstHand(playerCardMap), cards, cards.size);
+//dealerObj.draw(2, goToFirstHand(dealerCardMap), cards, cards.size);
+
+playerObj.testDraw(2, goToFirstHand(playerCardMap), cards, cards.size, 13, 13);
+dealerObj.testDraw(2, goToFirstHand(dealerCardMap), cards, cards.size, 13, 13);
 
 const reset = () => 
 {
         dealerObj.deleteHand(goToFirstHand(dealerCardMap));
-        dealerObj.resetHand(goToFirstHand(dealerCardMap), cards, cards.size);
+        dealerObj.resetHand(cards, cards.size);
         dealerObj.clearValueArr();
-        playerObj.resetHand(goToFirstHand(playerCardMap), cards, cards.size);
+        playerObj.resetHand(cards, cards.size);
         playerObj.clearValueArr();
         playerObj.playerReset();
         dealerObj.playerReset();
@@ -101,6 +104,24 @@ const compareHands = (player, dealer, money, bet) =>
     }
     //console.log(`money: ${money}`);
     return money;
+};
+
+const shuffle = () => 
+{
+
+    if (deckLength(cards) <= shuffleSize)
+    {
+        
+        newDeck(suits,names,cards,cardValue, numDecks, keyVals);
+        console.log("deck has been shuffled");
+        console.log(`${deckLength(cards)} cards in the deck`)
+    }
+    else 
+    {
+
+        console.log(`${deckLength(cards)} cards in the deck`)
+        return;
+    }
 }
 let min = 10;
 let max = 5000;
@@ -161,9 +182,11 @@ while (gamePrompt != "quit")
             gamePrompt = "quit";
             continue;
         }
+        
         console.log(`Your cash: ${money}`);
         while (bet == null)
         {
+           
             bet = prompt("place a bet: ")
             bet = Number(bet);
             if (!bet)
@@ -178,20 +201,22 @@ while (gamePrompt != "quit")
             }
           
         }
-        console.log(`bet: ${bet}`)
+        
+
         console.log("------New Hand------")
         console.log("Dealer: ");
-        dealerObj.printHand(goToFirstHand(dealerCardMap), true)
+        if (dealerCardMap.get(goToFirstHand(dealerCardMap))[1].value === 10 && dealerObj.hasInsuranceBet) dealerObj.printHand(goToFirstHand(dealerCardMap), false)
+        else dealerObj.printHand(goToFirstHand(dealerCardMap), true)
         console.log("You: ")
         playerObj.printHand(goToFirstHand(playerCardMap))
-     
-
+        console.log("--------------------")
+        shuffle();
         gamePrompt = prompt("type h to hit, s to stand, sp to split, i to place insurance bet, d to double down, or quit to end the game: ");
        
         if (gamePrompt == "h") 
             {
                 playerObj.hit(goToFirstHand(playerCardMap), cards, cards.size);
-                if (playerObj.calcHandValue(goToFirstHand(playerCardMap)) > 21) 
+                if (playerObj.calcHandValue(goToFirstHand(playerCardMap)) >= 21) 
                     {
                         console.log("You: ");
                         playerObj.printHand(goToFirstHand(playerCardMap));
@@ -237,7 +262,7 @@ while (gamePrompt != "quit")
         if (gamePrompt === "d")
         {
             let doubledBet = playerObj.doubleDown(goToFirstHand(playerCardMap), bet, cards, cards.size);
-            if (!playerObj.checkDoubleDown(goToFirstHand(playerCardMap))) stand(doubledBet);
+            if (doubledBet) stand(doubledBet);
         }
     }
 
