@@ -63,11 +63,13 @@ dealerObj.draw(2, goToFirstHand(dealerCardMap), cards, cards.size);
 
 const reset = () => 
 {
-        dealerObj.deleteHand(goToFirstHand(dealerCardMap), cards, cards.size);
+        dealerObj.deleteHand(goToFirstHand(dealerCardMap));
         dealerObj.resetHand(goToFirstHand(dealerCardMap), cards, cards.size);
         dealerObj.clearValueArr();
         playerObj.resetHand(goToFirstHand(playerCardMap), cards, cards.size);
         playerObj.clearValueArr();
+        playerObj.playerReset();
+        dealerObj.playerReset();
         
 };
 
@@ -123,6 +125,34 @@ while(buyIn == null)
 
 let bet = null;
 
+const stand = (modifiedBet) =>
+{
+    if (playerCardMap.size > 0)
+            {
+                playerObj.deleteHand(goToFirstHand(playerCardMap), modifiedBet);
+            }
+            if (playerCardMap.size === 0)
+            {
+                //stop dealer from playing hand if player has already busted
+            if (playerObj.valueArray.some((handValue) => handValue <= 21))
+            {
+                dealerObj.dealerPlays(goToFirstHand(dealerCardMap), cards, cards.size);
+                console.log("---dealer has played their hand---")
+            }
+
+            dealerObj.printHand(goToFirstHand(dealerCardMap));
+
+            playerObj.valueArray.forEach((value, index) => {
+                money = compareHands(value, dealerObj.calcHandValue(goToFirstHand(dealerCardMap)), money, playerObj.betArray[index]);
+            });
+
+           
+
+            reset();
+            bet = null;
+            }
+}
+
 while (gamePrompt != "quit")
     {
         if (money === 0)
@@ -132,10 +162,6 @@ while (gamePrompt != "quit")
             continue;
         }
         console.log(`Your cash: ${money}`);
-        console.log("Dealer: ");
-        dealerObj.printHand(goToFirstHand(dealerCardMap), false)
-        console.log("You: ")
-        playerObj.printHand(goToFirstHand(playerCardMap))
         while (bet == null)
         {
             bet = prompt("place a bet: ")
@@ -152,12 +178,25 @@ while (gamePrompt != "quit")
             }
           
         }
+        console.log(`bet: ${bet}`)
+        console.log("------New Hand------")
+        console.log("Dealer: ");
+        dealerObj.printHand(goToFirstHand(dealerCardMap), true)
+        console.log("You: ")
+        playerObj.printHand(goToFirstHand(playerCardMap))
+     
 
-        gamePrompt = prompt("type h to hit, s to stand, sp to split, or quit to quit the game: ");
+        gamePrompt = prompt("type h to hit, s to stand, sp to split, i to place insurance bet, d to double down, or quit to end the game: ");
        
         if (gamePrompt == "h") 
             {
                 playerObj.hit(goToFirstHand(playerCardMap), cards, cards.size);
+                if (playerObj.calcHandValue(goToFirstHand(playerCardMap)) > 21) 
+                    {
+                        console.log("You: ");
+                        playerObj.printHand(goToFirstHand(playerCardMap));
+                        stand(bet);
+                    };
             
             };
         if (gamePrompt == "sp")
@@ -167,31 +206,38 @@ while (gamePrompt != "quit")
         
         if (gamePrompt == "s")
         {
-            if (playerCardMap.size > 0)
+           stand(bet); 
+
+        }
+        
+        if (gamePrompt === "i")
+        {
+            let sideBet = null;
+            while (sideBet == null)
             {
-                playerObj.deleteHand(goToFirstHand(playerCardMap));
-            }
-            if (playerCardMap.size === 0)
+
+            sideBet = prompt(`Enter a side bet of up to half of ${bet}, your original bet: `);
+            sideBet = Number(sideBet);
+            if (!sideBet)
             {
-            
-            dealerObj.dealerPlays(goToFirstHand(dealerCardMap), cards, cards.size);
-
-            dealerObj.printHand(goToFirstHand(dealerCardMap));
-
-            playerObj.valueArray.forEach((value) => {
-                money = compareHands(value, dealerObj.calcHandValue(goToFirstHand(dealerCardMap)), money, bet);
-            });
-
-           
-
-            reset();
-            bet = null;
+                console.log("not a valid bet");
+                sideBet = null;
             }
+            else if (sideBet < 0 || sideBet > 0.5 * bet)
+            {
+                console.log("your bet is out of range.")
+                sideBet = null;
+            }
+            money = dealerObj.insuranceBet(goToFirstHand(dealerCardMap), money, sideBet);
+            //console.log(`your money: ${money}`)
+            }
+
+        }
+
+        if (gamePrompt === "d")
+        {
+            let doubledBet = playerObj.doubleDown(goToFirstHand(playerCardMap), bet, cards, cards.size);
+            if (!playerObj.checkDoubleDown(goToFirstHand(playerCardMap))) stand(doubledBet);
         }
     }
 
- console.log("---------------------dealer logic is below--------------------")
-// console.log(playerCardMap.keys().next().value)
-
-//console.log(dealer);
-//console.log(dealerCardMap.entries())

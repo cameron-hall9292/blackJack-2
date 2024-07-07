@@ -31,9 +31,11 @@ const createHandMap = (player, label) =>
             hand: new Map(),
             count: 0,
             valueArray: [],
-            deleteHand: function(key)
+            betArray: [],
+            deleteHand: function(key, bet)
                 {
-
+                    this.betArray.push(bet);
+                    console.log(`bet array: ${this.betArray}`)
                     this.valueArray.push(this.calcHandValue(key));
                     this.hand.delete(key);
                 },
@@ -41,6 +43,7 @@ const createHandMap = (player, label) =>
             clearValueArr: function()
                 {
                     this.valueArray.splice(0, this.valueArray.length);
+                    this.betArray.splice(0, this.betArray.length);
                 },
 
             resetHand: function(key, deck, deckSize)
@@ -76,7 +79,7 @@ const createHandMap = (player, label) =>
                     {
                         printArr.push(card.name);
                     });
-                    if (hide)
+                    if (hide && printArr.length === 2)
                     {
                         printArr.pop();
                         printArr.push("facedown card")
@@ -113,7 +116,7 @@ const createHandMap = (player, label) =>
                             
                             let randNum = Math.round(Math.random() * numUniqueCards);
                             if (!deck.has(randNum)) continue;
-                            let randCard = deck.get(randNum);
+                            let randCard = Object.assign({}, deck.get(randNum));
                             drawArr.push(randCard);
                             randCard.quantity--;
                             //delete cards from map
@@ -124,14 +127,77 @@ const createHandMap = (player, label) =>
                         }
                     this.hand.set(key, [...this.hand.get(key), ...drawArr]);
                     this.count = this.hand.size;
+
+                     //check for aces and modify their values if hand value exceeds 21
+
+                    if (this.checkForAces(key) && this.calcHandValue(key) > 21)
+                        {
+                            this.changeAceValue(key).value = 1;
+                        };
+
+
                 },
+
+                hasInsuranceBet: false,
+
+                checkInsurance: function(key)
+                {
+
+                    if (this.hand.get(key)[0].id === "A" && !this.hasInsuranceBet) return true
+                    else 
+                    {
+                    console.log("--- invalid insurance bet----")
+                    return false;
+                    }
+                },
+
+                insuranceBet: function(key, money, sideBet)
+                {
+                    if (!this.checkInsurance(key))
+                    {
+                        if (this.hand.get(key)[1].value === 10) 
+                            {
+                                money += sideBet * 2;
+                                this.printHand(key, false);
+                            }
+                        else money -= sideBet;
+                        
+                        this.hasInsuranceBet = true;
+                    }
+                    return money;
+
+                },
+
+                hasDoubledDown: false,
                 
                 checkDoubleDown: function (key)
                     {
                         const doubleDownVals = [9, 10, 11]
-                        if (doubleDownVals.includes(this.calcHandValue(key)) && this.hand.get(key).length == 2) return true
-                        else return false;
+                        if (doubleDownVals.includes(this.calcHandValue(key)) && this.hand.get(key).length == 2 && !this.hasDoubledDown) return true
+                        else 
+                        {
+                            console.log("---invalid attempt to double down---");
+                            return false;
+                        };
                     },
+                
+                doubleDown: function (key, bet, deck, deckSize)
+                    {
+                        if (!this.checkDoubleDown(key))
+                        {
+                            this.hit(key, deck, deckSize);
+                            this.printHand(key, false);
+                            bet *= 2;
+                            this.hasDoubledDown = true;
+                        }
+                        return bet;
+                    },
+                
+                playerReset: function()
+                {
+                    this.hasDoubledDown = false;
+                    this.hasInsuranceBet = false;
+                },
 
                 split: function (key, deck, deckSize)
                     {
@@ -183,7 +249,7 @@ const createHandMap = (player, label) =>
                 
                 hit: function (key, deck, deckSize) 
                     {
-                        if (this.calcHandValue(key) < 21) 
+                        if (this.calcHandValue(key) < 21 && !this.hasDoubledDown) 
                             {
                                 this.draw(1, key, deck, deckSize);
 
@@ -211,7 +277,7 @@ const createHandMap = (player, label) =>
                             }
                         else 
                             {
-                                console.log("------cannot hit when at or above 21------")
+                                console.log("------cannot hit when at or above 21 or if you have doubled down------")
                                 return
                             }
                     },
