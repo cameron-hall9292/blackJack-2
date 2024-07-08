@@ -99,10 +99,10 @@ const createHandMap = (player, label) =>
                     {
                         printArr.push({value: this.calcHandValue(key)});
                         console.log(printArr);
-                        return;
 
                     }
-                                   },
+                return printArr;
+                },
             
             checkIfSplittable: function(key)
                 {
@@ -169,6 +169,7 @@ const createHandMap = (player, label) =>
 
                     if (this.checkForAces(key) && this.calcHandValue(key) > 21)
                         {
+                            
                             this.changeAceValue(key).value = 1;
                         };
                 },
@@ -242,14 +243,24 @@ const createHandMap = (player, label) =>
                                 const hand1 = uuidv4();
                                 const hand2 = uuidv4();
 
-                                this.hand.set(hand1, [this.hand.get(key)[0]]);
-                                this.hand.set(hand2, [this.hand.get(key)[1]]);
+                                const firstHand = Object.assign({}, this.hand.get(key)[0])
+                                const secondHand = Object.assign({}, this.hand.get(key)[1])
 
-                                this.draw(1, hand1, deck, deckSize);
-                                this.draw(1, hand2, deck, deckSize);
-                                //delete initial hand
-                                this.hand.delete(key);
-                            }
+                             //if splitting aces, switch values back to inital value of 11
+
+                                if (firstHand.id === "A" && firstHand.value === 1) firstHand.value = 11;
+                                if (secondHand.id === "A" && secondHand.value === 1) secondHand.value = 11;
+                        
+
+                                    this.hand.set(hand1, [firstHand]);
+                                    this.hand.set(hand2, [secondHand]);
+
+                                    this.draw(1, hand1, deck, deckSize);
+                                    this.draw(1, hand2, deck, deckSize);
+                          
+                                    //delete initial hand
+                                    this.hand.delete(key);
+                                }
                         else 
                             {
                                 console.log("cannot split hand");
@@ -291,10 +302,10 @@ const createHandMap = (player, label) =>
 
                                 //check for aces and modify their values if hand value exceeds 21
 
-                                if (this.checkForAces(key) && this.calcHandValue(key) > 21)
-                                    {
-                                        this.changeAceValue(key).value = 1;
-                                    };
+                                //if (this.checkForAces(key) && this.calcHandValue(key) > 21)
+                                    //{
+                                        //this.changeAceValue(key).value = 1;
+                                    //};
 
                                 //this.printHand(key);
 
